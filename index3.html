@@ -9,8 +9,6 @@ style="background-color:#333">
 
 <!-- <p> her kan være knapper hvor man kan slå farve og tidszone skift til og fra</p> -->
 
-<p> Draw with your arrow keys </p>
-
 <script>
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -22,11 +20,11 @@ var totalTranslationY = 0;
 
 var timeZone0 = {city:"Copenhagen", hourOffset:0};
 var timeZone1 = {city:"London", hourOffset:-1};
-var timeZone2 = {city:"New York", hourOffset:-6};  // jeg skal vist huske at bruge module 12 længere nede *********
+var timeZone2 = {city:"New York", hourOffset:-6};  // jeg skal vist huske at bruge modulo 12 længere nede *********
 var timeZone3 = {city:"San Francisco", hourOffset:-8};
 var timeZone4 = {city:"Honolulu", hourOffset:-10};
-var timeZone5 = {city:"??????", hourOffset:-12};  // tilføj Tokyo, Beijing, Delhi, Moscow, Warsaw??
-var timeZone6 = {city:"??????", hourOffset:2};
+var timeZone5 = {city:"Christmas Island", hourOffset:-12};  // tilføj Tokyo, Beijing, Delhi, Moscow, Warsaw??
+var timeZone6 = {city:"Dubai", hourOffset:2};
 var timeZones = [timeZone0,timeZone1,timeZone2,timeZone6];
 var currentTimeZoneIndex = 0;
 // prøv at bruge push eller hvad det nu hedder til at tilføje tidszoner til arrayet
@@ -35,95 +33,10 @@ var currentTimeZoneIndex = 0;
 var colorlist = ["lightgreen","lightblue","red","magenta","brown","yellow", "pink"];
 var colorIndex = 0;
 
-var paddleHeight = 20;
-var paddleWidth = 20;
-var paddleX = 0; //(canvas.width-paddleWidth) / 2;
-var paddleY = 0; //canvas.height-paddleHeight;
-var paddleSpeed = 4;
-
-var rightPressed = false;
-var leftPressed = false;
-var upPressed = false;
-var downPressed = false;
-
-var brickRowCount = 3;
-var brickColumnCount = 5;
-var brickWidth = 75;
-var brickHeight = 20;
-var brickPadding = 10;
-var brickOffsetTop = 30;
-var brickOffsetLeft = 30;
-
-var bricks = [];
-
-function drawBricks() {
-  var anyBricksRemaining = false;
-    for(var c=0; c<brickColumnCount; c++) {
-        for(var r=0; r<brickRowCount; r++) {
-          if(bricks[c][r].status == 1) {  // så bricks kun tegnes hvis de endnu ikke er blevet ramt af bolden.
-            anyBricksRemaining = true;
-            var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
-            var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
-          }
-        }
-    }
-//  if (anyBricksRemaining == false) { // er det nok med == eller skal det være ===
-//    initializeBricks();
-//  }
-}
-
-
-// disse tre linier er udenfor funktionerne
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-//document.addEventListener("mousemove", mouseMoveHandler, false);
-
-
-function keyDownHandler(e) {
-    if(e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = true;
-console.log("højre piltast trykket"); // test
-    }
-    else if(e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = true;
-    }
-    else if(e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = true;
-    }
-    else if(e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = true;
-    }
-}
-
-function keyUpHandler(e) {
-    if(e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = false;
-console.log("højre piltast sluppet"); // test
-    }
-    else if(e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = false;
-    }
-    else if(e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = false;
-    }
-    else if(e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = false;
-    }
-}
-
 //ctx.save();
 ctx.translate(radius*0.9, radius*0.9);
 //ctx.translate(x, y);
 radius = radius * 0.90
-
-initializeBricks();
 
 setInterval(drawClock, 10);
 
@@ -154,22 +67,7 @@ currentTimeZoneIndex = getRndInteger(0,timeZones.length-1); // denne linie vælg
 }
 }
 
-
-
-
-function initializeBricks () {
-for(var c=0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for(var r=0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
-    }
-}
-}
-
-
-
-
-function clearClockFromScreen () { // Virker ved at den tegner en sort fyldt cirkel over det gamle ur inden det nye tegnes
+function clearScreen () {
 //  ctx.clearRect(-2*canvas.width, -2*canvas.height, 2*canvas.width, 2*canvas.height); // hvorfor virker denne ikke??
 //  ctx.clearRect(-2*canvas.width, -2*canvas.height, 0,0); // hvorfor virker denne ikke??
 
@@ -186,34 +84,13 @@ function clearClockFromScreen () { // Virker ved at den tegner en sort fyldt cir
 
 }
 
-function drawPaddle() {
-    ctx.beginPath();
-    ctx.arc(paddleX, paddleY, 20, 0, 2 * Math.PI);
-    //ctx.rect(paddleX, paddleY /*canvas.height-paddleHeight*/, paddleWidth, paddleHeight);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
-//    console.log("drawPaddle er blevet kaldt");
-}
-
 function drawClock() {
 //  ctx.clearRect(-2*canvas.width, -2*canvas.height, 2*canvas.width, 2*canvas.height); // hvorfor virker denne ikke??
-//  console.log("test");
-  clearClockFromScreen(); 
+  clearScreen();
   drawFace(ctx, radius);
   drawNumbers(ctx, radius);
   drawTime(ctx, radius);
-  
-  ctx.translate(-totalTranslationX - radius*0.9,-totalTranslationY - radius*0.9); // "nulstiller" translation
-  
-//  ctx.clearRect(0, 0, canvas.width, canvas.height);  
-  
-  drawPaddle();
-  //drawBricks();
-ctx.translate(totalTranslationX + radius*0.9,totalTranslationY + radius*0.9); // sætter translation til urets translation
-
-
-  ctx.translate(dx,dy);  
+  translate(dx,dy);  
   totalTranslationX = totalTranslationX + dx;
   totalTranslationY = totalTranslationY + dy;
 /*  
@@ -238,27 +115,6 @@ if(totalTranslationY + dy > (canvas.height - 2*radius) || totalTranslationY + dy
     changeTimeZone();
 }
 
-// Her er koden der ændrer paddle's position
-    if(rightPressed && paddleX < canvas.width-paddleWidth) {
-        paddleX += paddleSpeed;
-    }
-    else if(leftPressed && paddleX > 0) {
-        paddleX -= paddleSpeed;
-    }
-
-if(downPressed) {
-    paddleY += 7;
-    if (paddleY + paddleHeight > canvas.height){
-        paddleY = canvas.height - paddleHeight;
-    }
-}
-else if(upPressed) {
-    paddleY -= 7;
-    if (paddleY < 0){
-        paddleY = 0;
-    }
-}
-
 } // slut på drawClock funktionen
 
 function drawFace(ctx, radius) {
@@ -271,7 +127,7 @@ function drawFace(ctx, radius) {
   grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
   grad.addColorStop(0, '#333');
 //  grad.addColorStop(0,5, colorlist[colorIndex]);
-//  grad.addColorStop(0,5, 'gray'); // denne linie og den overstående virker overhovede ikke, men hvorfor???
+//  grad.addColorStop(0,5, 'gray'); // denne linie og den overstående virker overhovedet ikke, men hvorfor???
   grad.addColorStop(0.5, 'white');
 
   grad.addColorStop(1, '#333');
